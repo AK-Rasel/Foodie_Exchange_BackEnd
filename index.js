@@ -39,6 +39,14 @@ async function run() {
       const result = await cartCollection.insertOne(cart);
       res.send(result);
     });
+    // cart get
+    app.get("/api/v1/cart", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = cartCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
     // food collection
     app.get("/api/v1/food_items", async (req, res) => {
       const cursor = foodCollection.find(); //cursor point korar jonno
