@@ -1,11 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = 5000;
 
 app.use(cors());
+app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.SECRET_USER_NAME}:${process.env.SECRET_PASS}@cluster0.z9hqskk.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -21,19 +22,32 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
+    // foodCollection
     const foodCollection = client
       .db("Foodie_Exchange")
       .collection("foodCollection");
-    // const reviewsCollection = client.db("").collection("");
+    // reviews collection
+    const reviewsCollection = client
+      .db("Foodie_Exchange")
+      .collection("foodReviews");
+    // cart collection
+    const cartCollection = client.db("Foodie_Exchange").collection("cart");
 
-    // app.get("/api/v1/food_items", async (res, req) => {
-    //   const result = await foodCollection.find().toArray();
-    //   res.send(result);
-    // });
-
+    app.post("/api/v1/cart", async (req, res) => {
+      const cart = req.body;
+      console.log(cart);
+      const result = await cartCollection.insertOne(cart);
+      res.send(result);
+    });
+    // food collection
     app.get("/api/v1/food_items", async (req, res) => {
       const cursor = foodCollection.find(); //cursor point korar jonno
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // reviews collection
+    app.get("/api/v1/reviews", async (req, res) => {
+      const cursor = reviewsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
