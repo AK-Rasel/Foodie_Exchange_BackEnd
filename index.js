@@ -47,6 +47,26 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    // cart delete
+    app.delete("/api/v1/cart/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //delete
+    app.post("/api/v1/delete_items", async (req, res) => {
+      const ids = req.body.map((id) => new ObjectId(id));
+      try {
+        const result = await cartCollection.deleteMany({ _id: { $in: ids } });
+        res.json(result);
+      } catch (error) {
+        console.error("Error deleting items:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    });
+    //
     // food collection
     app.get("/api/v1/food_items", async (req, res) => {
       const cursor = foodCollection.find(); //cursor point korar jonno
