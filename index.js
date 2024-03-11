@@ -36,6 +36,9 @@ async function run() {
       .collection("foodReviews");
     // cart collection
     const cartCollection = client.db("Foodie_Exchange").collection("cart");
+    const bookingCollection = client
+      .db("Foodie_Exchange")
+      .collection("booking");
     // jwt Start
     app.post("/api/v1/jwt", (req, res) => {
       const userEmail = req.body;
@@ -164,6 +167,13 @@ async function run() {
         },
       };
       const result = await foodCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    // booking post
+    app.post("/api/v1/booking", async (req, res) => {
+      const booking = req.body;
+      // console.log(booking);
+      const result = await bookingCollection.insertOne(booking);
       res.send(result);
     });
     // add Items
