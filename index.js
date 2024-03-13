@@ -169,6 +169,27 @@ async function run() {
       const result = await foodCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
+    // ////////
+    app.patch("/api/v1/accept_booking/:id", async (req, res) => {
+      const id = req.params.id;
+      const booking = req.body;
+      // console.log(booking.activity, id);
+
+      console.log("update id", id);
+      const filter = { _id: new ObjectId(id) };
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          activity: booking.activity,
+        },
+      };
+      const result = await bookingCollection.updateOne(
+        filter,
+        updateDoc,
+        option
+      );
+      res.send(result);
+    });
     // booking post
     app.post("/api/v1/booking", async (req, res) => {
       const booking = req.body;
@@ -196,6 +217,30 @@ async function run() {
       const cursor = cartCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
+    });
+    // booking
+    app.get("/api/v1/booking", async (req, res) => {
+      const email = req.query.email;
+      let query = {};
+      if (email) {
+        query.email = email;
+      }
+      const cursor = bookingCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    //booking delete start----------------
+    app.post("/api/v1/delete_booking", async (req, res) => {
+      const ids = req.body.map((id) => new ObjectId(id));
+      try {
+        const result = await bookingCollection.deleteMany({
+          _id: { $in: ids },
+        });
+        res.json(result);
+      } catch (error) {
+        console.error("Error deleting items:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
     });
     // cart delete
     app.delete("/api/v1/cart/:id", async (req, res) => {
