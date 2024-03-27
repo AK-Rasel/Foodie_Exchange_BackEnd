@@ -275,9 +275,14 @@ async function run() {
     //delete close--------------
     // food collection
     app.get("/api/v1/food_items", async (req, res) => {
-      const cursor = foodCollection.find(); //cursor point korar jonno
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+      const skip = (page - 1) * limit;
+      const cursor = foodCollection.find().skip(skip).limit(limit); //cursor point korar jonno
       const result = await cursor.toArray();
-      res.send(result);
+
+      const total = await foodCollection.countDocuments();
+      res.send({ total, result });
     });
     // reviews collection
     app.get("/api/v1/reviews", async (req, res) => {
